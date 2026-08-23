@@ -5,6 +5,7 @@ export default function CustomCursor() {
   const labelRef = useRef<HTMLDivElement>(null);
   const [label, setLabel] = useState("");
   const [enabled, setEnabled] = useState(false);
+  const [moved, setMoved] = useState(false);
 
   useEffect(() => {
     const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
@@ -17,6 +18,7 @@ export default function CustomCursor() {
     let my = window.innerHeight / 2;
     let lx = mx;
     let ly = my;
+    let hasMoved = false;
 
     const onMove = (e: MouseEvent) => {
       mx = e.clientX;
@@ -26,6 +28,10 @@ export default function CustomCursor() {
       }
       const target = (e.target as HTMLElement)?.closest("[data-cursor]") as HTMLElement | null;
       setLabel(target?.getAttribute("data-cursor") || "");
+      if (!hasMoved) {
+        hasMoved = true;
+        setMoved(true);
+      }
     };
 
     let raf = 0;
@@ -53,7 +59,9 @@ export default function CustomCursor() {
     <>
       <div
         ref={dotRef}
-        className="pointer-events-none fixed left-0 top-0 z-[100] h-1.5 w-1.5 rounded-full bg-[var(--color-red)]"
+        className={`pointer-events-none fixed left-0 top-0 z-[100] h-1.5 w-1.5 rounded-full bg-[var(--color-red)] transition-opacity duration-200 ${
+          moved ? "opacity-100" : "opacity-0"
+        }`}
         style={{ willChange: "transform" }}
       />
       {label && (
